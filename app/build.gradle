@@ -57,11 +57,16 @@ dependencies {
     //GPU image
     implementation 'jp.co.cyberagent.android:gpuimage:2.1.0'
 
+    //Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1")
+
     //Koin - Dependency Injection
     implementation 'org.koin:koin-androidx-viewmodel:2.0.0'
 
     //View Model
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
+
 
 
 

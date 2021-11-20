@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.animation.AnimationUtils
+import androidx.lifecycle.lifecycleScope
 import com.mallam.imagefilters.R
 import com.mallam.imagefilters.databinding.ActivityMainBinding
 import com.mallam.imagefilters.utilities.BackgroundImages
@@ -15,14 +16,14 @@ class MainActivity : AppCompatActivity() {
     //Companion Object
     companion object{
         private var BACKGROUND_IMAGE_POSITION = 1
-        private var BREAK_LOOP = false
         private const val REQUEST_CODE_PICK_IMAGE = 1
         const val KEY_IMAGE_URi = "imageUri"
     }
 
     //Binding
     private lateinit var binding: ActivityMainBinding
-
+    //ChangeBackgroundImage Job
+    private lateinit var changeBackgroundJob : Job
 
     /** onCreate **/
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,7 +38,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        BREAK_LOOP = false
+
+        //Start changeBackground Job
         changeBackgroundImage()
     }
 
@@ -57,7 +59,6 @@ class MainActivity : AppCompatActivity() {
                 applicationContext,
                 SavedImagesActivity::class.java
             ).also { intent ->
-                BREAK_LOOP = true
                 startActivity(intent)
             }
         }
@@ -72,7 +73,6 @@ class MainActivity : AppCompatActivity() {
                     EditImageActivity::class.java
                 ).also { editImageIntent ->
                     editImageIntent.putExtra(KEY_IMAGE_URi, imageUri)
-                    BREAK_LOOP = true
                     startActivity(editImageIntent)
                 }
             }
@@ -80,8 +80,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun changeBackgroundImage(){
-        GlobalScope.launch {
-            while (!BREAK_LOOP){
+        changeBackgroundJob = lifecycleScope.launch {
+            while (true){
                 delay(8000L)
                 Log.d("Meeee", "changeBackgroundImage: ")
                 withContext(Dispatchers.Main){
@@ -96,5 +96,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+
+        //Stop changeBackground Job
+        GlobalScope.launch {
+            changeBackgroundJob.cancelAndJoin()
+        }
+    }
 
 }
